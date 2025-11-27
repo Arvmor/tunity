@@ -1,9 +1,14 @@
+"use client"
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Home } from "lucide-react";
+import { usePrivy } from "@privy-io/react-auth";
 
 /** The header component for the app */
 export default function AppHeader() {
+    const { connectOrCreateWallet } = usePrivy();
+
     return (
         <div className="flex p-4 justify-between">
             <h2 className="text-2xl font-bold">Tunity</h2>
@@ -15,7 +20,7 @@ export default function AppHeader() {
 
             <div className="flex gap-2">
                 <Button variant="ghost">Sign up</Button>
-                <Button variant="outline">Login</Button>
+                <Button variant="outline" onClick={() => connectOrCreateWallet()}>Login</Button>
             </div>
         </div>
     )
