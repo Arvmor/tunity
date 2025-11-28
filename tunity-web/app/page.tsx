@@ -1,4 +1,4 @@
-import AppItem, { ItemProps } from "@/components/app/item";
+import AppItem, { ItemProps } from "@/components/track/item";
 
 const trending: { title: string, items: ItemProps[] }[] = [
   {
