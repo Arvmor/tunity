@@ -9,3 +9,5 @@ actix-cors.workspace = true
 serde.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
+openlibx402-core.workspace = true
+openlibx402-actix.workspace = true
