@@ -1,4 +1,6 @@
 use crate::health::HealthRoute;
+use crate::x402::ConfigX402;
+use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use std::net;
 
@@ -22,6 +24,7 @@ impl<A: net::ToSocketAddrs> Server<A> {
     pub async fn run(self) -> anyhow::Result<()> {
         let app = || {
             App::new()
+                .app_data(Data::new(ConfigX402::build()))
                 .service(HealthRoute::Status)
                 .service(HealthRoute::Index)
         };

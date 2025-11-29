@@ -11,6 +11,8 @@ pub enum ResultAPI<D, E> {
     Success(D),
     /// The result is an error
     Error(E),
+    /// The result is a payment required
+    PaymentRequired(E),
 }
 
 impl<D> ResultAPI<D, ()> {
@@ -24,6 +26,17 @@ impl<E> ResultAPI<(), E> {
     /// Create an error result
     pub fn error(error: E) -> Self {
         Self::Error(error)
+    }
+}
+
+impl<D, E> ResultAPI<D, E> {
+    /// Create a successful result
+    pub fn verified_payment(data: D) -> Self {
+        Self::Success(data)
+    }
+    /// Create a payment required result
+    pub fn payment_required(payment: E) -> Self {
+        Self::PaymentRequired(payment)
     }
 }
 
