@@ -1,27 +1,33 @@
 use crate::utils::{API_VERSION, ResultAPI};
-use actix_web::{Responder, dev::HttpServiceFactory};
+use actix_web::dev::HttpServiceFactory;
+use actix_web::{Responder, get};
 
-pub struct HealthRoute;
-
-impl HealthRoute {
+/// The Health Routes
+#[derive(Debug)]
+pub enum HealthRoute {
     /// The health check status endpoint
-    pub fn status() -> impl HttpServiceFactory {
-        health
-    }
+    Status,
     /// The index endpoint
-    pub fn index() -> impl HttpServiceFactory {
-        index
-    }
+    Index,
 }
 
 /// The health check status endpoint
-#[actix_web::get("/health")]
+#[get("/health")]
 async fn health() -> impl Responder {
     ResultAPI::success("OK")
 }
 
 /// The index endpoint
-#[actix_web::get("/")]
+#[get("/")]
 async fn index() -> impl Responder {
     ResultAPI::success(API_VERSION)
+}
+
+impl HttpServiceFactory for HealthRoute {
+    fn register(self, config: &mut actix_web::dev::AppService) {
+        match self {
+            Self::Status => health.register(config),
+            Self::Index => index.register(config),
+        }
+    }
 }

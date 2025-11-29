@@ -22,8 +22,8 @@ impl<A: net::ToSocketAddrs> Server<A> {
     pub async fn run(self) -> anyhow::Result<()> {
         let app = || {
             App::new()
-                .service(HealthRoute::status())
-                .service(HealthRoute::index())
+                .service(HealthRoute::Status)
+                .service(HealthRoute::Index)
         };
 
         HttpServer::new(app).bind(self.addr)?.run().await?;
