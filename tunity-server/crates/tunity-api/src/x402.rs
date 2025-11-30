@@ -82,8 +82,9 @@ impl std::ops::Deref for ConfigX402 {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FacilitatorResponse {
-    pub success: bool,
-    pub network: String,
+    pub success: Option<bool>,
+    pub is_valid: Option<bool>,
+    pub network: Option<String>,
     pub transaction: Option<String>,
     pub payer: Option<String>,
     pub error_reason: Option<String>,

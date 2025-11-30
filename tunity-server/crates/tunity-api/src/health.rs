@@ -59,7 +59,7 @@ async fn payable(
     // Verify and settle the payment
     let facilitator = x402::FacilitatorRequest::new(payment, request.accepts[0].clone());
     if let Ok(response) = facilitator.verify()
-        && response.success
+        && Some(true) == response.is_valid
     {
         actix_web::rt::spawn(async move { facilitator.settle() });
         return ResultAPI::verified_payment("Access granted to basic tier");
