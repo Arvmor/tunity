@@ -43,8 +43,30 @@ async fn play(
         && Some(true) == response.is_valid
     {
         actix_web::rt::spawn(async move { facilitator.settle() });
-        return ResultAPI::verified_payment("Access granted to basic tier");
+
+        // Get Audio Sample
+        let audio_sample = get_audio_sample();
+        return ResultAPI::verified_payment(audio_sample);
     };
 
     ResultAPI::payment_required(request)
+}
+
+fn get_audio_sample() -> Vec<u8> {
+    const SAMPLE_DURATION_SECONDS: usize = 3;
+    const FRAMES_PER_SECOND: usize = 38;
+    const TOTAL_FRAMES: usize = SAMPLE_DURATION_SECONDS * FRAMES_PER_SECOND;
+
+    let mut sample = Vec::new();
+
+    for _ in 0..TOTAL_FRAMES {
+        sample.extend_from_slice(&[0xFF, 0xFB, 0x90, 0x00]);
+
+        let frame_size: usize = 417;
+        for i in 0..frame_size.saturating_sub(4) {
+            sample.push((i % 256) as u8);
+        }
+    }
+
+    sample
 }

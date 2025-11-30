@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TrackItem, { ItemProps } from "@/components/track/item";
 import XPay, { PayProps } from "@/components/privy/pay";
+import { ApiResponse } from "@/types/api";
 
 const propPay: PayProps = {
     url: "http://localhost/play",
@@ -10,13 +11,29 @@ const propPay: PayProps = {
     maxValue: BigInt(1000),
 }
 
-export default function TrackPlayer({title, name, image, size}: ItemProps) {
-    const { url, action, maxValue } = propPay;
-    const [data, setData] = useState();
+const AUDIO_TYPE = "audio/mpeg";
 
-    // Incoming Data Callback
+export default function TrackPlayer({title, name, image, size}: ItemProps) {
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [data, setData] = useState<ApiResponse<number[], any>>();
+    const { url, action, maxValue } = propPay;
+
     useEffect(() => {
-        console.log(data);
+        if (!audioRef.current || !data?.data || data.status !== 'Success') return;
+
+        const bytes = new Uint8Array(data.data);
+        const blob = new Blob([bytes], { type: AUDIO_TYPE });
+        const objectUrl = URL.createObjectURL(blob);
+        
+        const previousUrl = audioRef.current.src;
+        audioRef.current.src = objectUrl;
+
+        return () => {
+            URL.revokeObjectURL(objectUrl);
+            if (previousUrl && previousUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previousUrl);
+            }
+        };
     }, [data]);
 
     return (
@@ -24,6 +41,8 @@ export default function TrackPlayer({title, name, image, size}: ItemProps) {
             <h1 className="text-2xl font-bold">Track Player</h1>
             {/* Track info */}
             <TrackItem title={title} name={name} image={image} size={size} />
+            {/* Audio element */}
+            <audio ref={audioRef} controls />
             {/* Play button */}
             <XPay url={url} action={action} maxValue={maxValue} setData={setData} />
         </div>
