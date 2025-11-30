@@ -25,7 +25,6 @@ impl<A: net::ToSocketAddrs> Server<A> {
         let app = || {
             App::new()
                 .app_data(Data::new(ConfigX402::build()))
-                .service(HealthRoute::Payable)
                 .service(HealthRoute::Status)
                 .service(HealthRoute::Index)
                 .wrap(actix_cors::Cors::permissive())
