@@ -40,18 +40,19 @@ impl HttpServiceFactory for HealthRoute {
 #[get("/payable")]
 async fn payable(
     state: web::Data<x402::ConfigX402>,
-    auth: Option<openlibx402_actix::PaymentExtractor>,
+    auth: Option<x402::PaymentExtractor>,
 ) -> impl Responder {
     match auth {
         // Payment verified
         Some(_) => ResultAPI::verified_payment("Access granted to basic tier"),
         // No payment, return 402
         None => {
-            let requirement = openlibx402_actix::PaymentRequirement::new("0.01")
+            let requirement = openlibx402_actix::PaymentRequirement::new("10000")
                 .with_description("Access to basic tier data");
             let payment_request =
                 openlibx402_actix::create_payment_request(&state.config, &requirement, "/payable");
 
+            let payment_request = x402::X402Response::from((state.config.clone(), payment_request));
             ResultAPI::payment_required(payment_request)
         }
     }
