@@ -25,6 +25,15 @@ impl ConfigX402 {
     }
 }
 
+impl std::ops::Deref for ConfigX402 {
+    type Target = X402State;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+/// The payment request from x402 server
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaymentRequest {
@@ -71,14 +80,7 @@ impl From<(X402Config, openlibx402_core::models::PaymentRequest)> for X402Respon
     }
 }
 
-impl std::ops::Deref for ConfigX402 {
-    type Target = X402State;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
+/// The response from the x402 facilitator
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FacilitatorResponse {
@@ -90,6 +92,7 @@ pub struct FacilitatorResponse {
     pub error_reason: Option<String>,
 }
 
+/// The request to the x402 facilitator
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FacilitatorRequest {
@@ -121,6 +124,7 @@ impl FacilitatorRequest {
     }
 }
 
+/// The payment extractor from the client
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaymentExtractor {
@@ -130,6 +134,7 @@ pub struct PaymentExtractor {
     pub payload: PaymentPayload,
 }
 
+/// The payment payload received from the client
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaymentPayload {
@@ -137,6 +142,7 @@ pub struct PaymentPayload {
     pub authorization: PaymentAuthorization,
 }
 
+/// The payment authorization received from the client
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaymentAuthorization {
