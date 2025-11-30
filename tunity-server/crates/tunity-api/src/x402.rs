@@ -1,7 +1,11 @@
 use base64::{Engine, engine::general_purpose};
 use openlibx402_actix::{X402Config, X402State};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::future::{Ready, ready};
+
+/// The URL of the X402 facilitator
+const FACILITATOR_URL: &str = "https://www.x402.org/facilitator";
 
 /// The configuration for the X402 state
 pub struct ConfigX402(X402State);
@@ -21,7 +25,7 @@ impl ConfigX402 {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaymentRequest {
     pub scheme: String,
@@ -32,6 +36,7 @@ pub struct PaymentRequest {
     pub mime_type: String,
     pub pay_to: String,
     pub max_timeout_seconds: u64,
+    pub extra: HashMap<&'static str, &'static str>,
     pub asset: String,
 }
 
@@ -56,6 +61,7 @@ impl From<(X402Config, openlibx402_core::models::PaymentRequest)> for X402Respon
             pay_to: config.payment_address,
             max_timeout_seconds: 60,
             asset: config.token_mint,
+            extra: HashMap::from([("name", "USDC"), ("version", "2")]),
         };
 
         Self {
@@ -75,6 +81,47 @@ impl std::ops::Deref for ConfigX402 {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct FacilitatorResponse {
+    pub success: bool,
+    pub network: String,
+    pub transaction: Option<String>,
+    pub payer: Option<String>,
+    pub error_reason: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FacilitatorRequest {
+    pub x402_version: u32,
+    pub payment_payload: PaymentExtractor,
+    pub payment_requirements: PaymentRequest,
+}
+
+impl FacilitatorRequest {
+    /// Create a new FacilitatorRequest
+    pub fn new(payment_payload: PaymentExtractor, payment_requirements: PaymentRequest) -> Self {
+        Self {
+            x402_version: payment_payload.x402_version,
+            payment_payload: payment_payload,
+            payment_requirements,
+        }
+    }
+    /// Verify the payment
+    pub fn verify(&self) -> anyhow::Result<FacilitatorResponse> {
+        let url = format!("{FACILITATOR_URL}/verify");
+        let response = ureq::post(&url).send_json(self)?;
+        Ok(response.into_json()?)
+    }
+    /// Settle the payment
+    pub fn settle(&self) -> anyhow::Result<FacilitatorResponse> {
+        let url = format!("{FACILITATOR_URL}/settle");
+        let response = ureq::post(&url).send_json(self)?;
+        Ok(response.into_json()?)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PaymentExtractor {
     pub x402_version: u32,
     pub scheme: String,
@@ -82,14 +129,14 @@ pub struct PaymentExtractor {
     pub payload: PaymentPayload,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaymentPayload {
     pub signature: String,
     pub authorization: PaymentAuthorization,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaymentAuthorization {
     pub from: String,
