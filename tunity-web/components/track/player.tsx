@@ -19,8 +19,7 @@ export default function TrackPlayer({title, name, image, size}: ItemProps) {
     const { url, maxValue } = propPay;
 
     return (
-        <div>
-            <h1 className="text-2xl font-bold">Track Player</h1>
+        <div className="flex flex-col gap-4">
             {/* Track info */}
             <TrackItem title={title} name={name} image={image} size={size} />
             {/* Audio element */}
@@ -61,17 +60,15 @@ export function PlayIslands({url, maxValue}: PayProps) {
     }
 
     return (
-        <>
-            <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon" onClick={handlePlay}>
-                    {isPlaying ? <Pause /> : <Play /> }
-                </Button>
-                <Slider defaultValue={[0.8]} />
-                <Button variant="ghost" size="icon"><Rewind /></Button>
-                <Button variant="ghost" size="icon"><FastForward /></Button>
-            </div>
+        <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" onClick={handlePlay}>
+                {isPlaying ? <Pause /> : <Play /> }
+            </Button>
+            <Slider defaultValue={[0]} />
+            <Button variant="ghost" size="icon"><Rewind /></Button>
+            <Button variant="ghost" size="icon"><FastForward /></Button>
             <audio ref={ref} hidden/>
-        </>
+        </div>
     )
 }
 
