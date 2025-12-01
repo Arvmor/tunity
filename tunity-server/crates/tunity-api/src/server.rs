@@ -1,4 +1,5 @@
 use crate::health::HealthRoute;
+use crate::player::PlayerRoute;
 use crate::x402::ConfigX402;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
@@ -25,6 +26,7 @@ impl<A: net::ToSocketAddrs> Server<A> {
         let app = || {
             App::new()
                 .app_data(Data::new(ConfigX402::build()))
+                .service(PlayerRoute::Play)
                 .service(HealthRoute::Status)
                 .service(HealthRoute::Index)
                 .wrap(actix_cors::Cors::permissive())

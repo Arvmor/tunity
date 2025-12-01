@@ -15,7 +15,7 @@ export interface ItemProps {
 /** Item component */
 export default function TrackItem({ title, name, image, size}: ItemProps) {
     return (
-        <div>
+        <div className="flex flex-col gap-2">
             <Image src={image} alt={title} width={size} height={size} />
             <h2 className="text-md font-bold">{title}</h2>
             <h3 className="text-muted-foreground">{name}</h3>
