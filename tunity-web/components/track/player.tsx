@@ -51,7 +51,7 @@ export function PlayIslands({url, maxValue}: PayProps) {
 
         // Play the track
         setIsPlaying(prev => {
-            if (!ref.current || !isPaid) return prev;
+            if (!ref.current) return prev;
             
             // Toggle the play/pause state
             prev ? ref.current?.pause() : ref.current?.play();
@@ -76,15 +76,8 @@ export function PlayIslands({url, maxValue}: PayProps) {
 function setAudioData(data: number[], player: HTMLAudioElement) {
     const bytes = new Uint8Array(data);
     const blob = new Blob([bytes], { type });
-    const objectUrl = URL.createObjectURL(blob);
 
-    // Set the audio data to the player
-    const previousUrl = player.src;
-    player.src = objectUrl;
-
-    // Revoke the object URL
-    URL.revokeObjectURL(objectUrl);
-    if (previousUrl && previousUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(previousUrl);
-    }
+    // Create & Clean the object URL
+    URL.revokeObjectURL(player.src);
+    player.src = URL.createObjectURL(blob);
 }
