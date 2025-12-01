@@ -1,81 +1,101 @@
 use base64::{Engine, engine::general_purpose};
-use openlibx402_actix::{X402Config, X402State};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::future::{Ready, ready};
+use url::Url;
 
 /// The URL of the X402 facilitator
 const FACILITATOR_URL: &str = "https://www.x402.org/facilitator";
 
 /// The configuration for the X402 state
-pub struct ConfigX402(X402State);
-
-impl ConfigX402 {
-    /// Build a new ConfigX402
-    pub fn build() -> Self {
-        let config = X402Config {
-            payment_address: "0xaeeb8456f598F7242Ed32bC9658BA20f6B4557fd".to_string(),
-            token_mint: "0x036CbD53842c5426634e7929541eC2318f3dCF7e".to_string(),
-            network: "base-sepolia".to_string(),
-            rpc_url: Some("https://public.pimlico.io/v2/84532/rpc".to_string()),
-            auto_verify: true,
-        };
-
-        Self(X402State { config })
-    }
+pub struct ConfigX402<S> {
+    pub scheme: S,
+    pub payment_address: S,
+    pub token: S,
+    pub network: S,
+    pub mime_type: S,
+    pub extra: HashMap<S, S>,
 }
 
-impl std::ops::Deref for ConfigX402 {
-    type Target = X402State;
+impl ConfigX402<&'static str> {
+    /// Build a new ConfigX402
+    pub fn build() -> Self {
+        let scheme = "exact";
+        let payment_address = "0xaeeb8456f598F7242Ed32bC9658BA20f6B4557fd";
+        let token = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
+        let network = "base-sepolia";
+        let mime_type = "application/json";
+        let extra = HashMap::from([("name", "USDC"), ("version", "2")]);
 
-    fn deref(&self) -> &Self::Target {
-        &self.0
+        Self {
+            scheme,
+            payment_address,
+            token,
+            network,
+            mime_type,
+            extra,
+        }
     }
 }
 
 /// The payment request from x402 server
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PaymentRequest {
-    pub scheme: String,
-    pub network: String,
-    pub max_amount_required: String,
-    pub resource: String,
-    pub description: Option<String>,
-    pub mime_type: String,
-    pub pay_to: String,
+pub struct PaymentRequest<S> {
+    pub scheme: S,
+    pub network: S,
+    pub max_amount_required: S,
+    pub resource: Url,
+    pub description: Option<S>,
+    pub mime_type: S,
+    pub pay_to: S,
     pub max_timeout_seconds: u64,
-    pub extra: HashMap<&'static str, &'static str>,
-    pub asset: String,
+    pub extra: HashMap<S, S>,
+    pub asset: S,
+}
+
+impl<S> PaymentRequest<S>
+where
+    S: AsRef<str> + Copy,
+{
+    /// Create a new PaymentRequest
+    pub fn new(
+        config: &ConfigX402<S>,
+        max_amount_required: S,
+        description: S,
+        resource: Url,
+    ) -> Self {
+        Self {
+            scheme: config.scheme,
+            network: config.network,
+            max_amount_required,
+            resource,
+            description: Some(description),
+            mime_type: config.mime_type,
+            pay_to: config.payment_address,
+            max_timeout_seconds: 60,
+            asset: config.token,
+            extra: config.extra.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct X402Response {
+pub struct X402Response<S> {
     pub x402_version: u32,
-    pub accepts: Vec<PaymentRequest>,
+    pub accepts: Vec<PaymentRequest<S>>,
 }
 
-impl From<(X402Config, openlibx402_core::models::PaymentRequest)> for X402Response {
-    fn from(
-        (config, payment_request): (X402Config, openlibx402_core::models::PaymentRequest),
-    ) -> Self {
-        let payment_request = PaymentRequest {
-            scheme: "exact".to_string(),
-            network: config.network.clone(),
-            max_amount_required: payment_request.max_amount_required,
-            resource: payment_request.resource,
-            description: payment_request.description,
-            mime_type: "application/json".to_string(),
-            pay_to: config.payment_address,
-            max_timeout_seconds: 60,
-            asset: config.token_mint,
-            extra: HashMap::from([("name", "USDC"), ("version", "2")]),
-        };
+impl<S: Copy> X402Response<S> {
+    /// Create a new X402Response
+    pub fn new(payment_requests: &[PaymentRequest<S>]) -> Self {
+        let x402_version = 1;
+        let accepts = payment_requests.to_vec();
 
         Self {
-            x402_version: 1,
-            accepts: vec![payment_request],
+            x402_version,
+            accepts,
         }
     }
 }
@@ -95,18 +115,18 @@ pub struct FacilitatorResponse {
 /// The request to the x402 facilitator
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct FacilitatorRequest {
+pub struct FacilitatorRequest<S> {
     pub x402_version: u32,
     pub payment_payload: PaymentExtractor,
-    pub payment_requirements: PaymentRequest,
+    pub payment_requirements: PaymentRequest<S>,
 }
 
-impl FacilitatorRequest {
+impl<S: Copy + Serialize> FacilitatorRequest<S> {
     /// Create a new FacilitatorRequest
-    pub fn new(payment_payload: PaymentExtractor, payment_requirements: PaymentRequest) -> Self {
+    pub fn new(payment_payload: PaymentExtractor, payment_requirements: PaymentRequest<S>) -> Self {
         Self {
             x402_version: payment_payload.x402_version,
-            payment_payload: payment_payload,
+            payment_payload,
             payment_requirements,
         }
     }
@@ -114,13 +134,13 @@ impl FacilitatorRequest {
     pub fn verify(&self) -> anyhow::Result<FacilitatorResponse> {
         let url = format!("{FACILITATOR_URL}/verify");
         let response = ureq::post(&url).send_json(self)?;
-        Ok(response.into_json()?)
+        Ok(response.into_body().read_json()?)
     }
     /// Settle the payment
     pub fn settle(&self) -> anyhow::Result<FacilitatorResponse> {
         let url = format!("{FACILITATOR_URL}/settle");
         let response = ureq::post(&url).send_json(self)?;
-        Ok(response.into_json()?)
+        Ok(response.into_body().read_json()?)
     }
 }
 

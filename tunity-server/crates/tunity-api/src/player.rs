@@ -1,9 +1,8 @@
 use crate::ResultAPI;
-use crate::x402::{ConfigX402, FacilitatorRequest, PaymentExtractor, X402Response};
+use crate::x402::{ConfigX402, FacilitatorRequest, PaymentExtractor, PaymentRequest, X402Response};
 use actix_web::dev::HttpServiceFactory;
 use actix_web::{HttpRequest, web};
 use actix_web::{Responder, get};
-use openlibx402_actix::{PaymentRequirement, create_payment_request};
 
 /// The Player Routes
 #[derive(Debug)]
@@ -24,15 +23,14 @@ impl HttpServiceFactory for PlayerRoute {
 #[get("/play")]
 async fn play(
     request: HttpRequest,
-    state: web::Data<ConfigX402>,
+    config: web::Data<ConfigX402<&'static str>>,
     auth: Option<PaymentExtractor>,
 ) -> impl Responder {
-    let config = state.config.clone();
-    let req = PaymentRequirement::new("1000").with_description("Access to play the track");
-    let payload = create_payment_request(&config, &req, request.full_url().as_str());
+    let url = request.full_url();
+    let req = PaymentRequest::new(&config, "1000", "Access to play the track", url);
+    let request = X402Response::new(&[req]);
 
     // Check received payment
-    let request = X402Response::from((config, payload));
     let Some(payment) = auth else {
         return ResultAPI::payment_required(request);
     };
