@@ -1,11 +1,10 @@
 use crate::ResultAPI;
+use crate::utils;
 use crate::x402::{ConfigX402, FacilitatorRequest, PaymentExtractor, PaymentRequest, X402Response};
 use actix_web::Responder;
 use actix_web::dev::HttpServiceFactory;
 use actix_web::{HttpRequest, post, web};
 use serde::Deserialize;
-use std::io::{BufReader, Read, Seek, SeekFrom};
-use std::path::Path;
 
 /// The Player Routes
 #[derive(Debug)]
@@ -30,7 +29,7 @@ pub struct PlayRequest {
     /// The offset to start playing from
     pub offset: u64,
     /// The length of the sample to play
-    pub _length: usize,
+    pub length: usize,
 }
 
 /// The play endpoint
@@ -54,7 +53,7 @@ async fn play(
     let facilitator = FacilitatorRequest::new(payment, request.accepts[0].clone());
     if let Ok(response) = facilitator.verify()
         && Some(true) == response.is_valid
-        && let Ok(audio_sample) = get_sample(&*payload.file, payload.offset)
+        && let Ok(audio_sample) = utils::get_chunk(&*payload.file, payload.offset, payload.length)
     {
         actix_web::rt::spawn(async move { facilitator.settle() });
 
@@ -63,15 +62,4 @@ async fn play(
     };
 
     ResultAPI::payment_required(request)
-}
-
-fn get_sample<F: AsRef<Path>>(file: F, offset: u64) -> anyhow::Result<[u8; 300_000]> {
-    let file = std::fs::File::open(file)?;
-    let mut reader = BufReader::new(file);
-
-    reader.seek(SeekFrom::Start(offset))?;
-    let mut buff = [0u8; 300_000];
-    reader.read_exact(&mut buff)?;
-
-    Ok(buff)
 }
