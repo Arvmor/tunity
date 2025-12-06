@@ -1,4 +1,3 @@
-use crate::utils;
 use crate::x402::{ConfigX402, FacilitatorRequest, PaymentExtractor, PaymentRequest, X402Response};
 use crate::{Database, MemoryDB, ResultAPI};
 use actix_multipart::form::MultipartForm;
@@ -33,7 +32,7 @@ pub struct PlayRequest {
     /// The file to play
     pub file: String,
     /// The offset to start playing from
-    pub offset: u64,
+    pub offset: usize,
     /// The length of the sample to play
     pub length: usize,
 }
@@ -48,7 +47,7 @@ async fn play(
     auth: Option<PaymentExtractor>,
 ) -> impl Responder {
     let url = request.full_url();
-    let price = db.get_price(0).unwrap_or(1000);
+    let price = db.get_price(&payload.file).unwrap_or("1000".to_string());
     let req = PaymentRequest::new(&config, price.to_string(), "Access to play the track", url);
     let request = X402Response::new(&[req]);
 
@@ -61,12 +60,13 @@ async fn play(
     let facilitator = FacilitatorRequest::new(payment, request.accepts[0].clone());
     if let Ok(response) = facilitator.verify()
         && Some(true) == response.is_valid
-        && let Ok(audio_sample) = utils::get_chunk(&*payload.file, payload.offset, payload.length)
+        && let Ok(content) = db.get_content(&payload.file)
     {
         actix_web::rt::spawn(async move { facilitator.settle() });
 
         // Get Audio Sample
-        return ResultAPI::verified_payment(audio_sample.to_vec());
+        let sample = content[payload.offset..payload.offset + payload.length].to_vec();
+        return ResultAPI::verified_payment(sample);
     };
 
     ResultAPI::payment_required(request)

@@ -27,15 +27,16 @@ impl HttpServiceFactory for PricingRoute {
 #[serde(rename_all = "camelCase")]
 pub struct SetPriceRequest {
     /// The price to set
-    pub price: u64,
+    pub price: String,
 }
 
 #[post("/price")]
 async fn set_price(
-    price: web::Json<SetPriceRequest>,
+    payload: web::Json<SetPriceRequest>,
     db: web::ThinData<MemoryDB>,
 ) -> impl Responder {
-    match db.set_price(price.price) {
+    let price = payload.into_inner().price;
+    match db.set_price(price) {
         Ok(key) => ResultAPI::okay(key),
         Err(e) => {
             tracing::error!("Error setting price: {e:?}");
@@ -45,8 +46,8 @@ async fn set_price(
 }
 
 #[get("/price/{key}")]
-async fn get_price(key: web::Path<usize>, db: web::ThinData<MemoryDB>) -> impl Responder {
-    match db.get_price(*key) {
+async fn get_price(key: web::Path<String>, db: web::ThinData<MemoryDB>) -> impl Responder {
+    match db.get_price(&key) {
         Ok(price) => ResultAPI::okay(price),
         Err(e) => {
             tracing::error!("Error getting price: {e:?}");
