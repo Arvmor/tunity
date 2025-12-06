@@ -1,5 +1,5 @@
-use crate::{ConfigX402, HealthRoute, PlayerRoute, PricingRoute};
-use actix_web::web::Data;
+use crate::{ConfigX402, HealthRoute, MemoryDB, PlayerRoute, PricingRoute};
+use actix_web::web::{Data, ThinData};
 use actix_web::{App, HttpServer};
 use std::net;
 
@@ -24,6 +24,7 @@ impl<A: net::ToSocketAddrs> Server<A> {
         let app = || {
             App::new()
                 .app_data(Data::new(ConfigX402::build()))
+                .app_data(ThinData(MemoryDB::default()))
                 .service(PlayerRoute::Play)
                 .service(HealthRoute::Status)
                 .service(HealthRoute::Index)

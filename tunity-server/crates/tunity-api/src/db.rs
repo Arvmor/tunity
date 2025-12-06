@@ -20,7 +20,7 @@ pub trait Database {
 }
 
 /// In-memory database
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct MemoryDB {
     prices: Arc<RwLock<HashMap<usize, u64>>>,
     contents: Arc<RwLock<HashMap<usize, Vec<u8>>>>,
