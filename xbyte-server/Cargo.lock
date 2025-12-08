@@ -1655,32 +1655,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tunity-app"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "tokio",
- "tunity_api",
-]
-
-[[package]]
-name = "tunity_api"
-version = "0.1.0"
-dependencies = [
- "actix-cors",
- "actix-multipart",
- "actix-web",
- "anyhow",
- "base64",
- "serde",
- "serde_json",
- "tracing",
- "ureq",
- "url",
- "uuid",
-]
-
-[[package]]
 name = "typenum"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2077,6 +2051,32 @@ name = "writeable"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9edde0db4769d2dc68579893f2306b26c6ecfbe0ef499b013d731b7b9247e0b9"
+
+[[package]]
+name = "xbyte_api"
+version = "0.1.0"
+dependencies = [
+ "actix-cors",
+ "actix-multipart",
+ "actix-web",
+ "anyhow",
+ "base64",
+ "serde",
+ "serde_json",
+ "tracing",
+ "ureq",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "xbyte_app"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "tokio",
+ "xbyte_api",
+]
 
 [[package]]
 name = "yoke"

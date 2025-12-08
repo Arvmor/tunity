@@ -1,11 +1,11 @@
 [workspace]
 resolver = "3"
-members = ["crates/tunity-api", "crates/tunity-app"]
+members = ["crates/xbyte-api", "crates/xbyte-app"]
 
 [workspace.dependencies]
 # Local Crates
-tunity_api = { path = "crates/tunity-api" }
-tunity_app = { path = "crates/tunity-app" }
+xbyte_api = { path = "crates/xbyte-api" }
+xbyte_app = { path = "crates/xbyte-app" }
 
 # Common dependencies
 tokio = { version = "1.48.0", features = ["full"] }

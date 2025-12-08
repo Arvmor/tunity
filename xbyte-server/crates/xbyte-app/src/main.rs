@@ -1,4 +1,4 @@
-use tunity_api::Server;
+use xbyte_api::Server;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

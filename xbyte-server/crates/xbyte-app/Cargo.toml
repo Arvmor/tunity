@@ -1,9 +1,9 @@
 [package]
-name = "tunity-app"
+name = "xbyte_app"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tunity_api.workspace = true
+xbyte_api.workspace = true
 anyhow.workspace = true
 tokio.workspace = true
