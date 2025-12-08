@@ -3,9 +3,12 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import TrackItem, { ItemProps } from "@/components/track/item";
 import XPay, { PayProps, useXPayAsync } from "@/components/privy/pay";
-import { FastForward, Pause, Play, Rewind } from "lucide-react";
+import { Check, FastForward, Pause, Play, Rewind } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { PlayRequest } from "@/packages/tunity-sdk/src/types";
+import { Input } from "../ui/input";
+import { UUID } from "crypto";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_TUNITY_API_URL ?? "http://127.0.0.1:80";
 
@@ -21,36 +24,25 @@ const propPay: PayProps = {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            file: "1",
-            offset: 0,
-            length: 700_000,
-        }),
     },
     maxValue: BigInt(1000),
 }
 
-/** The payment properties for the video track */
-const propPay2: PayProps = {
-    ...propPay,
-    body: {
-        ...propPay.body,
-        body: JSON.stringify({
-            file: "0",
-            offset: 0,
-            length: 700_000,
-        }),
-    },
-}
-
 /** The track player component */
 export default function TrackPlayer({title, name, image, size}: ItemProps) {
-    const { url, body, maxValue } = propPay;
+    const [playRequest, setPlayRequest] = useState<PlayRequest | null>(null);
+    
+    const { url, maxValue } = propPay;
+    const body = {
+        ...propPay.body,
+        body: JSON.stringify(playRequest),
+    };
 
     return (
         <div className="flex flex-col gap-4">
             {/* Track info */}
             <TrackItem title={title} name={name} image={image} size={size} />
+            <ContentInput onSubmit={setPlayRequest} />
             {/* Audio element */}
             <XPay>
                 <PlayIslands url={url} body={body} maxValue={maxValue} />
@@ -106,22 +98,27 @@ export function PlayIslands({url, body, maxValue}: PayProps) {
 }
 
 /** Movie Player component */
-export function MoviePlayer({title, name}: ItemProps) {
-    const { url, body, maxValue } = propPay2;
+export function MoviePlayer({ title, name }: ItemProps) {
+    const [playRequest, setPlayRequest] = useState<PlayRequest | null>(null);
+
+    const { url, maxValue } = propPay;
+    const body = {
+        ...propPay.body,
+        body: JSON.stringify(playRequest),
+    };
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Track info */}
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-2">
                 <h2 className="text-md font-bold">{title}</h2>
                 <h3 className="text-muted-foreground">{name}</h3>
+                <ContentInput onSubmit={setPlayRequest} />
             </div>
-            {/* Audio element */}
             <XPay>
                 <MoviePlayIslands url={url} body={body} maxValue={maxValue} />
             </XPay>
         </div>
-    )
+    );
 }
 
 /** The movie play islands component */
@@ -190,4 +187,59 @@ function setPlayerData(data: number[], player: HTMLAudioElement | HTMLVideoEleme
     // Create & Clean the object URL
     URL.revokeObjectURL(player.src);
     player.src = URL.createObjectURL(blob);
+}
+
+interface ContentInputProps {
+    onSubmit: (request: PlayRequest) => void;
+}
+
+export function ContentInput({ onSubmit }: ContentInputProps) {
+    const [key, setKey] = useState("");
+    const [offset, setOffset] = useState("0");
+    const [length, setLength] = useState("0");
+    const [statusMessage, setStatusMessage] = useState("");
+
+    const isValid = key.length > 0 && !isNaN(Number(offset)) && !isNaN(Number(length));
+
+    const handleSubmit = () => {
+        if (!isValid) return;
+        onSubmit({
+            key: key as UUID,
+            offset: Number(offset),
+            length: Number(length),
+        });
+        setStatusMessage("Content set successfully");
+    };
+
+    return (
+        <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+                <Input
+                    type="text"
+                    placeholder="Content UUID"
+                    value={key}
+                    onChange={(e) => setKey(e.target.value)}
+                />
+            </div>
+            <div className="flex items-center gap-2">
+                <Input
+                    type="number"
+                    placeholder="Offset"
+                    value={offset}
+                    onChange={(e) => setOffset(e.target.value)}
+                />
+                <Input
+                    type="number"
+                    placeholder="Length"
+                    value={length}
+                    onChange={(e) => setLength(e.target.value)}
+                />
+                <Button size="icon" onClick={handleSubmit} disabled={!isValid}>
+                    <Check />
+                </Button>
+            </div>
+            {/* Status message */}
+            {statusMessage && <p className="text-sm text-green-600">{statusMessage}</p>}
+        </div>
+    );
 }
