@@ -11,7 +11,7 @@ pub trait Database {
     /// The key type
     type Key;
     /// Set the price
-    fn set_price(&self, price: Self::Price) -> anyhow::Result<Self::Key>;
+    fn set_price(&self, key: &Self::Key, price: Self::Price) -> anyhow::Result<()>;
     /// Get the price
     fn get_price(&self, key: &Self::Key) -> anyhow::Result<Self::Price>;
     /// Set content
@@ -32,12 +32,17 @@ impl Database for MemoryDB {
     type Content = Vec<u8>;
     type Key = Uuid;
 
-    fn set_price(&self, price: Self::Price) -> anyhow::Result<Self::Key> {
+    fn set_price(&self, key: &Self::Key, price: Self::Price) -> anyhow::Result<()> {
+        // Check if the content exists
+        if self.contents.read().unwrap().get(key).is_none() {
+            return Err(anyhow::anyhow!("Content not found"));
+        }
+
+        // Set the price
         let mut db = self.prices.write().unwrap();
-        let key = Uuid::new_v4();
         db.insert(key.clone(), price);
 
-        Ok(key)
+        Ok(())
     }
 
     fn get_price(&self, key: &Self::Key) -> anyhow::Result<Self::Price> {
