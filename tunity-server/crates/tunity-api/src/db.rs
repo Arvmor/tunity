@@ -40,7 +40,7 @@ impl Database for MemoryDB {
 
         // Set the price
         let mut db = self.prices.write().unwrap();
-        db.insert(key.clone(), price);
+        db.insert(*key, price);
 
         Ok(())
     }
@@ -55,7 +55,7 @@ impl Database for MemoryDB {
     fn set_content(&self, content: Self::Content) -> anyhow::Result<Self::Key> {
         let mut db = self.contents.write().unwrap();
         let key = Uuid::new_v4();
-        db.insert(key.clone(), content);
+        db.insert(key, content);
 
         Ok(key)
     }

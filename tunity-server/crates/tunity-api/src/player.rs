@@ -7,6 +7,7 @@ use actix_web::dev::HttpServiceFactory;
 use actix_web::{HttpRequest, post, web};
 use serde::Deserialize;
 use std::io::Read;
+use uuid::Uuid;
 
 /// The Player Routes
 #[derive(Debug)]
@@ -29,8 +30,8 @@ impl HttpServiceFactory for PlayerRoute {
 /// The request to play a sample
 #[derive(Debug, Deserialize)]
 pub struct PlayRequest {
-    /// The file to play
-    pub file: String,
+    /// The key to play
+    pub key: Uuid,
     /// The offset to start playing from
     pub offset: usize,
     /// The length of the sample to play
@@ -47,7 +48,7 @@ async fn play(
     auth: Option<PaymentExtractor>,
 ) -> impl Responder {
     let url = request.full_url();
-    let price = db.get_price(&payload.file).unwrap_or("1000".to_string());
+    let price = db.get_price(&payload.key).unwrap_or("1000".to_string());
     let req = PaymentRequest::new(&config, price.to_string(), "Access to play the track", url);
     let request = X402Response::new(&[req]);
 
@@ -60,7 +61,7 @@ async fn play(
     let facilitator = FacilitatorRequest::new(payment, request.accepts[0].clone());
     if let Ok(response) = facilitator.verify()
         && Some(true) == response.is_valid
-        && let Ok(content) = db.get_content(&payload.file)
+        && let Ok(content) = db.get_content(&payload.key)
     {
         actix_web::rt::spawn(async move { facilitator.settle() });
 
