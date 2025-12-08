@@ -1,10 +1,13 @@
 import { ApiResponse, PlayRequest, PlayResponse, SetPriceRequest, X402PaymentPayload } from "./types";
 
+/** The default Tunity URL */
+const DEFAULT_TUNITY_URL = "http://localhost:80";
+
 export class TunityClient {
   private readonly tunityUrl: string;
 
-  constructor(tunityUrl: string) {
-    this.tunityUrl = tunityUrl;
+  constructor(tunityUrl?: string) {
+    this.tunityUrl = tunityUrl ?? DEFAULT_TUNITY_URL;
   }
 
   private async request<T>(

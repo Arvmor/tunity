@@ -2,21 +2,15 @@
 
 import { useMemo } from "react";
 import { usePrivy } from "@privy-io/react-auth";
-import { TunityClient } from "@/lib/tunity-client";
+import { TunityClient } from "@/packages/tunity-sdk";
 import PublishForm from "@/components/publish/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload } from "lucide-react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_TUNITY_API_URL ?? "http://localhost:80";
-
 export default function PublishPage() {
     const { user, ready, connectOrCreateWallet } = usePrivy();
-
-    const client = useMemo(
-        () => TunityClient.builder().baseUrl(API_BASE_URL).build(),
-        []
-    );
+    const client = useMemo(() => new TunityClient(), []);
 
     if (!ready) {
         return (

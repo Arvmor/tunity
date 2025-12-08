@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, ChangeEvent, FormEvent } from "react";
-import { TunityClient } from "@/lib/tunity-client";
+import { TunityClient } from "@/packages/tunity-sdk";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,11 +11,7 @@ import { Upload, DollarSign, CheckCircle, XCircle, FileAudio, FileVideo, Trash2 
 type UploadState = "idle" | "uploading" | "success" | "error";
 type PriceState = "idle" | "setting" | "success" | "error";
 
-interface PublishFormProps {
-    client: TunityClient;
-}
-
-export default function PublishForm({ client }: PublishFormProps) {
+export default function PublishForm(client: TunityClient) {
     const [file, setFile] = useState<File | null>(null);
     const [contentKey, setContentKey] = useState<string>("");
     const [price, setPrice] = useState<string>("");
