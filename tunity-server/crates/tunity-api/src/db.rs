@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
+use uuid::Uuid;
 
 /// A trait for a database
 pub trait Database {
@@ -22,18 +23,18 @@ pub trait Database {
 /// In-memory database
 #[derive(Debug, Default, Clone)]
 pub struct MemoryDB {
-    prices: Arc<RwLock<HashMap<String, String>>>,
-    contents: Arc<RwLock<HashMap<String, Vec<u8>>>>,
+    prices: Arc<RwLock<HashMap<Uuid, String>>>,
+    contents: Arc<RwLock<HashMap<Uuid, Vec<u8>>>>,
 }
 
 impl Database for MemoryDB {
     type Price = String;
     type Content = Vec<u8>;
-    type Key = String;
+    type Key = Uuid;
 
     fn set_price(&self, price: Self::Price) -> anyhow::Result<Self::Key> {
         let mut db = self.prices.write().unwrap();
-        let key = db.len().to_string();
+        let key = Uuid::new_v4();
         db.insert(key.clone(), price);
 
         Ok(key)
@@ -48,7 +49,7 @@ impl Database for MemoryDB {
 
     fn set_content(&self, content: Self::Content) -> anyhow::Result<Self::Key> {
         let mut db = self.contents.write().unwrap();
-        let key = db.len().to_string();
+        let key = Uuid::new_v4();
         db.insert(key.clone(), content);
 
         Ok(key)
