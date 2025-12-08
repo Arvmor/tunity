@@ -8,7 +8,7 @@ export interface PlayRequest {
 
 export interface SetPriceRequest {
   key: UUID;
-  price: string;
+  price: number;
 }
 
 /**

@@ -23,12 +23,12 @@ pub trait Database {
 /// In-memory database
 #[derive(Debug, Default, Clone)]
 pub struct MemoryDB {
-    prices: Arc<RwLock<HashMap<Uuid, String>>>,
+    prices: Arc<RwLock<HashMap<Uuid, u64>>>,
     contents: Arc<RwLock<HashMap<Uuid, Vec<u8>>>>,
 }
 
 impl Database for MemoryDB {
-    type Price = String;
+    type Price = u64;
     type Content = Vec<u8>;
     type Key = Uuid;
 
@@ -49,7 +49,7 @@ impl Database for MemoryDB {
         let db = self.prices.read().unwrap();
         let result = db.get(key).ok_or(anyhow::anyhow!("Price not found"))?;
 
-        Ok(result.clone())
+        Ok(*result)
     }
 
     fn set_content(&self, content: Self::Content) -> anyhow::Result<Self::Key> {

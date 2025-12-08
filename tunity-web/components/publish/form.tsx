@@ -124,7 +124,7 @@ function PriceCard({ client }: { client: TunityClient }) {
         setPriceState("setting");
         
         // Format the price to 6 decimals
-        const formattedPrice = formatAmount(price, 6).toString();
+        const formattedPrice = formatAmount(price, 6);
         const response = await client.setPrice({ key, price: formattedPrice });
         if (response.status === "Success") {
             setPriceState("success");
@@ -161,7 +161,7 @@ function PriceCard({ client }: { client: TunityClient }) {
                     </div>
                     <div className="flex flex-col gap-2">
                         <label htmlFor="price" className="text-sm font-medium">
-                            Price (USDC)
+                            Price (USDC) / 1MB
                         </label>
                         <Input
                             id="price"

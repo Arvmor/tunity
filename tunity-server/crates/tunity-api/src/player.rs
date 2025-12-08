@@ -1,3 +1,4 @@
+use crate::utils;
 use crate::x402::{ConfigX402, FacilitatorRequest, PaymentExtractor, PaymentRequest, X402Response};
 use crate::{Database, MemoryDB, ResultAPI};
 use actix_multipart::form::MultipartForm;
@@ -48,11 +49,18 @@ async fn play(
     auth: Option<PaymentExtractor>,
 ) -> impl Responder {
     let url = request.full_url();
-    let price = db.get_price(&payload.key).unwrap_or("1000".to_string());
-    let req = PaymentRequest::new(&config, price.to_string(), "Access to play the track", url);
-    let request = X402Response::new(&[req]);
+    // Get the price in USDC / 1MB
+    let price = db.get_price(&payload.key).unwrap_or(1000);
+    let total_price = utils::calculate_price(price as f32, payload.length as f32);
+    let req = PaymentRequest::new(
+        &config,
+        total_price.to_string(),
+        "Access to play the track",
+        url,
+    );
 
     // Check received payment
+    let request = X402Response::new(&[req]);
     let Some(payment) = auth else {
         return ResultAPI::payment_required(request);
     };

@@ -30,7 +30,7 @@ pub struct SetPriceRequest {
     /// The key to set the price for
     pub key: Uuid,
     /// The price to set
-    pub price: String,
+    pub price: u64,
 }
 
 #[post("/price")]
