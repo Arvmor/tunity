@@ -205,7 +205,7 @@ function UploadStatus({ state, contentKey }: { state: UploadState, contentKey: U
                 </Link>
                 <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
                     <CheckCircle className="size-4" />
-                    <span className="text-sm">Uploaded</span>
+                    <span className="text-sm">Uploaded {contentKey}</span>
                 </div>
             </div>
         );
