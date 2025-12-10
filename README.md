@@ -8,6 +8,8 @@ e.g.: Pay 0.001 USDC per 1MB of a movie.
 
 ![xByte Demo](./docs/demo.gif)
 
+Find pitch-day slides [here](./docs/xByte-slides.pdf).
+
 ### How to Run
 
 Requires Node and Rust to be installed.
