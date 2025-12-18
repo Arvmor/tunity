@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useCallback, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -40,7 +40,7 @@ function createPlayRequestBody(key: UUID, offset: number, length: number): Reque
 }
 
 /** The track player component */
-export default function TrackPlayer({title, name, image, size}: ItemProps) {
+export default function TrackPlayer({ title, name, image, size }: ItemProps) {
     return (
         <div className="flex flex-col gap-4">
             <TrackItem title={title} name={name} image={image} size={size} />
@@ -48,7 +48,7 @@ export default function TrackPlayer({title, name, image, size}: ItemProps) {
                 <StreamingPlayer mimeType={AUDIO_MIME} />
             </XPay>
         </div>
-    )
+    );
 }
 
 interface StreamingPlayerProps {
@@ -59,7 +59,7 @@ interface StreamingPlayerProps {
 export function StreamingPlayer({ mimeType }: StreamingPlayerProps) {
     const searchParams = useSearchParams();
     const keyFromUrl = searchParams.get("key") ?? "";
-    
+
     const [contentKey, setContentKey] = useState(keyFromUrl);
     const [chunkSize, setChunkSize] = useState("");
     const [chunkState, setChunkState] = useState<ChunkState | null>(null);
@@ -68,7 +68,7 @@ export function StreamingPlayer({ mimeType }: StreamingPlayerProps) {
     const [duration, setDuration] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [totalBytes, setTotalBytes] = useState(0);
-    
+
     const isAudio = mimeType === AUDIO_MIME;
     const ref = useRef<HTMLAudioElement | HTMLVideoElement | null>(null);
     const xPayAsync = useXPayAsync();
@@ -81,35 +81,35 @@ export function StreamingPlayer({ mimeType }: StreamingPlayerProps) {
 
     const fetchNextChunk = useCallback(async () => {
         if (!contentKey || isLoading) return;
-        
+
         const size = Number(chunkSize) * DEFAULT_CHUNK_SIZE;
         const currentOffset = chunkState?.offset ?? 0;
-        
+
         setIsLoading(true);
-        
+
         const { status, data } = await xPayAsync({
             url: PLAY_URL,
             body: createPlayRequestBody(contentKey as UUID, currentOffset, size),
             maxValue: MAX_PAYMENT_VALUE,
         });
-        
+
         setIsLoading(false);
-        
-        if (status !== 'Success') return;
-        
+
+        if (status !== "Success") return;
+
         const newChunk = new Uint8Array(data);
         const prevChunks = chunkState?.chunks ?? [];
         const allChunks = [...prevChunks, newChunk];
-        
+
         setChunkState({
             key: contentKey as UUID,
             offset: currentOffset + newChunk.length,
             chunkSize: size,
             chunks: allChunks,
         });
-        
-        setTotalBytes(prev => prev + newChunk.length);
-        
+
+        setTotalBytes((prev) => prev + newChunk.length);
+
         if (ref.current) {
             updatePlayerSource(ref.current, allChunks, mimeType);
         }
@@ -147,32 +147,41 @@ export function StreamingPlayer({ mimeType }: StreamingPlayerProps) {
                 onChunkSizeChange={setChunkSize}
                 onReset={resetPlayer}
             />
-            
+
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>Loaded: {formatBytes(totalBytes)}</span>
                 {chunkState && <span>| Chunks: {chunkState.chunks.length}</span>}
             </div>
 
-            {isAudio 
-                ? <audio ref={ref as React.RefObject<HTMLAudioElement>} onTimeUpdate={onTimeUpdate} hidden />
-                : <video ref={ref as React.RefObject<HTMLVideoElement>} onTimeUpdate={onTimeUpdate} />
-            }
-            
+            {isAudio ? (
+                <audio
+                    ref={ref as React.RefObject<HTMLAudioElement>}
+                    onTimeUpdate={onTimeUpdate}
+                    hidden
+                />
+            ) : (
+                <video ref={ref as React.RefObject<HTMLVideoElement>} onTimeUpdate={onTimeUpdate} />
+            )}
+
             <div className="flex items-center gap-4">
-                <Button 
-                    variant="outline" 
-                    size="icon" 
+                <Button
+                    variant="outline"
+                    size="icon"
                     onClick={handlePlayPause}
                     disabled={!hasContent}
                 >
                     {isPlaying ? <Pause /> : <Play />}
                 </Button>
-                
+
                 <Slider defaultValue={[0]} value={[currentTime]} max={duration || 1} />
-                
-                <Button variant="ghost" size="icon" disabled><Rewind /></Button>
-                <Button variant="ghost" size="icon" disabled><FastForward /></Button>
-                
+
+                <Button variant="ghost" size="icon" disabled>
+                    <Rewind />
+                </Button>
+                <Button variant="ghost" size="icon" disabled>
+                    <FastForward />
+                </Button>
+
                 <Button
                     variant="secondary"
                     size="icon"
@@ -204,22 +213,22 @@ export function MoviePlayer({ title, name }: ItemProps) {
 
 /** Updates the player source by combining all chunks */
 function updatePlayerSource(
-    player: HTMLAudioElement | HTMLVideoElement, 
-    chunks: Uint8Array[], 
-    mimeType: string
+    player: HTMLAudioElement | HTMLVideoElement,
+    chunks: Uint8Array[],
+    mimeType: string,
 ) {
     const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
     const combined = new Uint8Array(totalLength);
-    
+
     let offset = 0;
-    chunks.forEach(chunk => {
+    chunks.forEach((chunk) => {
         combined.set(chunk, offset);
         offset += chunk.length;
     });
-    
+
     const blob = new Blob([combined], { type: mimeType });
     const currentTime = player.currentTime;
-    
+
     URL.revokeObjectURL(player.src);
     player.src = URL.createObjectURL(blob);
     player.currentTime = currentTime;
@@ -234,12 +243,12 @@ function formatBytes(bytes: number): string {
     return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
 }
 
-function ContentKeyInput({ 
-    contentKey, 
-    chunkSize, 
-    onKeyChange, 
+function ContentKeyInput({
+    contentKey,
+    chunkSize,
+    onKeyChange,
     onChunkSizeChange,
-    onReset 
+    onReset,
 }: {
     contentKey: string;
     chunkSize: string;

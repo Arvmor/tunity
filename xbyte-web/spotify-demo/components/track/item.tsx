@@ -13,7 +13,7 @@ export interface ItemProps {
 }
 
 /** Item component */
-export default function TrackItem({ title, name, image, size}: ItemProps) {
+export default function TrackItem({ title, name, image, size }: ItemProps) {
     return (
         <div className="flex flex-col gap-2">
             <Image src={image} alt={title} width={size} height={size} />

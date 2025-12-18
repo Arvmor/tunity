@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -20,10 +20,14 @@ export default function AppHeader() {
             {/* Search bar */}
             <div className="flex gap-2">
                 <Link href="/">
-                    <Button variant="outline" size="icon"><Home /></Button>
+                    <Button variant="outline" size="icon">
+                        <Home />
+                    </Button>
                 </Link>
                 <Link href="/publish">
-                    <Button variant="outline" size="icon"><Upload /></Button>
+                    <Button variant="outline" size="icon">
+                        <Upload />
+                    </Button>
                 </Link>
                 <Input placeholder="What do you want to play?" />
             </div>
@@ -31,17 +35,21 @@ export default function AppHeader() {
             {/* User info*/}
             {user ? <UserInfo user={user} /> : <Onboarding onClick={connectOrCreateWallet} />}
         </div>
-    )
+    );
 }
 
 /** The onboarding component for the app */
 function Onboarding({ onClick }: { onClick: () => void }) {
     return (
         <div className="flex gap-2">
-            <Button variant="ghost" onClick={onClick}>Sign up</Button>
-            <Button variant="outline" onClick={onClick}>Login</Button>
+            <Button variant="ghost" onClick={onClick}>
+                Sign up
+            </Button>
+            <Button variant="outline" onClick={onClick}>
+                Login
+            </Button>
         </div>
-    )
+    );
 }
 
 /** The user info component for the app */
@@ -53,7 +61,7 @@ function UserInfo({ user }: { user: User }) {
     const handleCopy = async () => {
         if (!address) return;
         await navigator.clipboard.writeText(address);
-    }
+    };
 
     return (
         <div className="flex items-center gap-2">
@@ -67,5 +75,5 @@ function UserInfo({ user }: { user: User }) {
                 <User2 className="size-5" />
             </div>
         </div>
-    )
+    );
 }

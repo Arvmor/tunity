@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useMemo } from "react";
 import { xByteClient } from "xbyte-sdk";
@@ -21,4 +21,3 @@ export default function PublishPage() {
         </div>
     );
 }
-
