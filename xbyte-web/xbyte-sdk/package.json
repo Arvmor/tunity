@@ -1,35 +1,35 @@
 {
-  "name": "xbyte-sdk",
-  "version": "0.0.1",
-  "description": "xbyte SDK",
-  "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "name": "xbyte-sdk",
+    "version": "0.0.1",
+    "description": "xbyte SDK",
+    "keywords": [],
+    "license": "MIT",
+    "type": "module",
+    "main": "./dist/index.js",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./*": {
+            "types": "./dist/*.d.ts",
+            "import": "./dist/*.js"
+        }
     },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "import": "./dist/*.js"
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc -b",
+        "lint": "oxlint src",
+        "lint:fix": "oxlint --fix src",
+        "format": "oxfmt src",
+        "format:check": "oxfmt --check src"
+    },
+    "devDependencies": {
+        "@types/node": "^20",
+        "typescript": "^5"
     }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsc -b",
-    "lint": "oxlint src",
-    "lint:fix": "oxlint --fix src",
-    "format": "oxfmt src",
-    "format:check": "oxfmt --check src"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "typescript": "^5"
-  },
-  "keywords": [],
-  "license": "MIT"
 }

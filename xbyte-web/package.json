@@ -1,27 +1,27 @@
 {
-  "name": "xbyte-web",
-  "private": true,
-  "workspaces": [
-    "spotify-demo",
-    "xbyte-sdk"
-  ],
-  "devDependencies": {
-    "oxfmt": "^0.18.0",
-    "oxlint": "^1.33.0"
-  },
-  "scripts": {
-    "dev": "bun run --filter spotify-web dev",
-    "build": "bun run --filter xbyte-sdk build && bun run --filter spotify-web build",
-    "build:sdk": "bun run --filter xbyte-sdk build",
-    "lint": "bun run --filter xbyte-sdk lint && bun run --filter spotify-web lint",
-    "lint:fix": "bun run --filter xbyte-sdk lint:fix && bun run --filter spotify-web lint:fix",
-    "format": "bun run --filter xbyte-sdk format && bun run --filter spotify-web format",
-    "format:check": "bun run --filter xbyte-sdk format:check && bun run --filter spotify-web format:check",
-    "format:sdk": "bun run --filter xbyte-sdk format",
-    "format:check:sdk": "bun run --filter xbyte-sdk format:check"
-  },
-  "packageManager": "bun@1.3.4",
-  "engines": {
-    "bun": ">=1.3.4"
-  }
+    "name": "xbyte-web",
+    "private": true,
+    "workspaces": [
+        "spotify-demo",
+        "xbyte-sdk"
+    ],
+    "scripts": {
+        "dev": "bun run --filter spotify-web dev",
+        "build": "bun run --filter xbyte-sdk build && bun run --filter spotify-web build",
+        "build:sdk": "bun run --filter xbyte-sdk build",
+        "lint": "bun run --filter xbyte-sdk lint && bun run --filter spotify-web lint",
+        "lint:fix": "bun run --filter xbyte-sdk lint:fix && bun run --filter spotify-web lint:fix",
+        "format": "bun run --filter xbyte-sdk format && bun run --filter spotify-web format",
+        "format:check": "bun run --filter xbyte-sdk format:check && bun run --filter spotify-web format:check",
+        "format:sdk": "bun run --filter xbyte-sdk format",
+        "format:check:sdk": "bun run --filter xbyte-sdk format:check"
+    },
+    "devDependencies": {
+        "oxfmt": "^0.18.0",
+        "oxlint": "^1.33.0"
+    },
+    "packageManager": "bun@1.3.4",
+    "engines": {
+        "bun": ">=1.3.4"
+    }
 }
