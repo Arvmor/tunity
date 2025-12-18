@@ -1,13 +1,20 @@
 {
   "name": "xbyte-web",
   "private": true,
+  "workspaces": [
+    "spotify-demo",
+    "xbyte-sdk"
+  ],
   "scripts": {
-    "dev": "pnpm --filter spotify-web dev",
-    "build": "pnpm --filter xbyte-sdk build && pnpm --filter spotify-web build",
-    "build:sdk": "pnpm --filter xbyte-sdk build",
-    "lint": "pnpm -r lint"
+    "dev": "bun run --filter spotify-web dev",
+    "build": "bun run --filter xbyte-sdk build && bun run --filter spotify-web build",
+    "build:sdk": "bun run --filter xbyte-sdk build",
+    "lint": "bun run --filter xbyte-sdk lint && bun run --filter spotify-web lint",
+    "format:sdk": "bun run --filter xbyte-sdk format",
+    "format:check:sdk": "bun run --filter xbyte-sdk format:check"
   },
-  "packageManager": "pnpm@10.12.4"
+  "packageManager": "bun@1.3.4",
+  "engines": {
+    "bun": ">=1.3.4"
+  }
 }
-
-
