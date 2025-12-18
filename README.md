@@ -2,13 +2,13 @@
 
 xByte, the infra-as-a-service protocol.
 
-Facilitates "Pay-per-Byte" x402 payments, allows content-agnostic monetization model for platforms (Netflix, Spotify, Twitch, etc.), instead of monthly subscriptions!
+Facilitates "Pay-per-Byte" x402 payments, allows content-agnostic monetization model for platforms (Netflix, Spotify, Twitch, etc.), instead of monthly subscriptions! [more information](./docs/xByte_slides.pdf)
 
 e.g.: Pay 0.001 USDC per 1MB of a movie.
 
-![xByte Demo](./docs/demo.gif)
+### 🏆 2nd Place - AVAX x402 Hackathon
 
-Find pitch-day slides [here](./docs/xByte-slides.pdf).
+![xByte Demo](./docs/demo.gif)
 
 ### How to Run
 
@@ -24,13 +24,13 @@ $ cargo run --release
 
 # For SDK (builds the SDK package)
 $ cd xbyte-web/xbyte-sdk
-$ pnpm i
-$ pnpm build
+$ bun i
+$ bun build
 
 # For Demo website (runs at localhost:3000)
-$ cd xbyte-web
-$ pnpm i
-$ pnpm dev
+$ cd xbyte-web/spotify-demo
+$ bun i
+$ bun dev
 ```
 
 ## Description

@@ -115,14 +115,13 @@ export function StreamingPlayer({ mimeType }: StreamingPlayerProps) {
         }
     }, [contentKey, chunkSize, chunkState, isLoading, xPayAsync, mimeType]);
 
-    const handlePlayPause = () => {
+    const handlePlayPause = async () => {
         if (!ref.current) return;
-        
-        setIsPlaying(prev => {
-            if (prev) ref.current?.pause();
-            else ref.current?.play();
-            return !prev;
-        });
+
+        if (isPlaying) ref.current?.pause();
+        else await ref.current?.play();
+
+        setIsPlaying(!isPlaying);
     };
 
     const resetPlayer = () => {

@@ -50,9 +50,9 @@ function UserInfo({ user }: { user: User }) {
     const shortAddress = `${address?.slice(0, 8)}...${address?.slice(-8)}`;
 
     /** Handle the copy of the address */
-    const handleCopy = () => {
+    const handleCopy = async () => {
         if (!address) return;
-        navigator.clipboard.writeText(address);
+        await navigator.clipboard.writeText(address);
     }
 
     return (
