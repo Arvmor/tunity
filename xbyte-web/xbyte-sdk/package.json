@@ -21,15 +21,13 @@
   ],
   "scripts": {
     "build": "tsc -b",
-    "lint": "eslint",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
+    "format": "oxfmt src",
+    "format:check": "oxfmt --check src"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "eslint": "^9",
-    "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.6.2",
     "typescript": "^5"
   },
   "keywords": [],
