@@ -8,6 +8,7 @@ xbyte_api = { path = "crates/xbyte-api" }
 xbyte_app = { path = "crates/xbyte-app" }
 
 # Common dependencies
+dotenv = "0.15.0"
 tokio = { version = "1.48.0", features = ["full"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
@@ -22,6 +23,13 @@ actix-web = { version = "4.12.1", features = ["rustls"] }
 actix-multipart = "0.7.2"
 actix-cors = "0.7.1"
 url = "2.5.7"
+
+# AWS dependencies
+aws-config = { version = "1.8.5", features = [
+    "rustls",
+    "behavior-version-latest",
+] }
+aws-sdk-s3 = { version = "1.118.0", features = ["behavior-version-latest"] }
 
 # x402 dependencies
 ureq = { version = "3.1.4", features = ["rustls", "json"] }

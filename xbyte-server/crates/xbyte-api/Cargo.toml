@@ -15,3 +15,5 @@ ureq.workspace = true
 url.workspace = true
 actix-multipart.workspace = true
 uuid.workspace = true
+aws-config.workspace = true
+aws-sdk-s3.workspace = true
