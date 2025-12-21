@@ -3,6 +3,7 @@
     "private": true,
     "workspaces": [
         "spotify-demo",
+        "xbyte-platform",
         "xbyte-sdk"
     ],
     "scripts": {
