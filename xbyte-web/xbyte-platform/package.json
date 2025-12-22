@@ -12,6 +12,7 @@
         "format:check": "oxfmt --check"
     },
     "dependencies": {
+        "@radix-ui/react-slot": "*",
         "class-variance-authority": "*",
         "clsx": "*",
         "lucide-react": "*",

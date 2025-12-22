@@ -67,6 +67,7 @@
       "name": "xbyte-platform",
       "version": "0.1.0",
       "dependencies": {
+        "@radix-ui/react-slot": "*",
         "class-variance-authority": "*",
         "clsx": "*",
         "lucide-react": "*",
