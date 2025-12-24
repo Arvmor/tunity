@@ -42,10 +42,6 @@ impl<D, E> ResultAPI<D, E> {
     pub fn failure(error: E) -> Self {
         Self::Error(error)
     }
-    /// Create a successful result
-    pub fn verified_payment(data: D) -> Self {
-        Self::Success(data)
-    }
     /// Create a payment required result
     pub fn payment_required(payment: E) -> Self {
         Self::PaymentRequired(payment)
