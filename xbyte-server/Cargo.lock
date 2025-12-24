@@ -4165,6 +4165,7 @@ dependencies = [
  "aws-config",
  "aws-sdk-s3",
  "base64",
+ "dotenv",
  "serde",
  "serde_json",
  "tracing",
