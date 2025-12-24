@@ -5,7 +5,6 @@ use actix_web::Responder;
 use actix_web::dev::HttpServiceFactory;
 use actix_web::{HttpRequest, post, web};
 use serde::Deserialize;
-use uuid::Uuid;
 
 /// The Player Routes
 #[derive(Debug)]
@@ -26,7 +25,7 @@ impl HttpServiceFactory for PlayerRoute {
 #[derive(Debug, Deserialize)]
 pub struct PlayRequest {
     /// The key to play
-    pub key: Uuid,
+    pub key: (String, String),
     /// The offset to start playing from
     pub offset: usize,
     /// The length of the sample to play
@@ -66,8 +65,8 @@ async fn play(
         && Some(true) == response.is_valid
         && let Ok(bytes) = s3
             .get_range(
-                "xbyte-runtime",
-                &payload.key.to_string(),
+                &payload.key.0,
+                &payload.key.1,
                 payload.offset as u64,
                 payload.length as u64,
             )

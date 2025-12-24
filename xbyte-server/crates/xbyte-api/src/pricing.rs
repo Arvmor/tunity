@@ -3,7 +3,6 @@ use actix_web::Responder;
 use actix_web::dev::HttpServiceFactory;
 use actix_web::{get, post, web};
 use serde::Deserialize;
-use uuid::Uuid;
 
 /// The Pricing Routes
 #[derive(Debug)]
@@ -27,8 +26,10 @@ impl HttpServiceFactory for PricingRoute {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetPriceRequest {
-    /// The key to set the price for
-    pub key: Uuid,
+    /// The bucket
+    pub bucket: String,
+    /// The object
+    pub object: String,
     /// The price to set
     pub price: u64,
 }
@@ -40,7 +41,7 @@ async fn set_price(
 ) -> impl Responder {
     let payload = payload.into_inner();
 
-    match db.set_price(&payload.key, payload.price) {
+    match db.set_price((payload.bucket, payload.object), payload.price) {
         Ok(key) => ResultAPI::okay(key),
         Err(error) => {
             tracing::error!(?error, "Failed to set price");
@@ -49,14 +50,11 @@ async fn set_price(
     }
 }
 
-#[get("/price/{key}")]
-async fn get_price(key: web::Path<String>, db: web::ThinData<MemoryDB>) -> impl Responder {
-    // Parse the key as a UUID
-    let Ok(key) = Uuid::parse_str(key.as_str()) else {
-        tracing::warn!(?key, "Invalid key");
-        return ResultAPI::failure("Invalid key");
-    };
-
+#[get("/price/{bucket}/{object}")]
+async fn get_price(
+    key: web::Path<(String, String)>,
+    db: web::ThinData<MemoryDB>,
+) -> impl Responder {
     // Get the price
     match db.get_price(&key) {
         Ok(price) => ResultAPI::okay(price),
