@@ -81,12 +81,39 @@ mod tests {
         let client = XByteS3::new().await;
         let buckets = client.list_buckets().await?;
         let Some(bucket_name) = buckets.into_iter().next().and_then(|f| f.name) else {
+            eprintln!("No bucket found, skipping test");
             return Ok(());
         };
 
         // List objects in the bucket
         let objects = client.list_objects(&bucket_name).await;
         assert!(objects.is_ok());
+        Ok(())
+    }
+
+    #[actix_web::test]
+    async fn test_get_range() -> anyhow::Result<()> {
+        dotenv::dotenv().ok();
+
+        // Create a new client
+        let client = XByteS3::new().await;
+        let buckets = client.list_buckets().await?;
+        let Some(bucket_name) = buckets.into_iter().next().and_then(|f| f.name) else {
+            eprintln!("No bucket found, skipping test");
+            return Ok(());
+        };
+
+        // List objects in the bucket
+        let objects = client.list_objects(&bucket_name).await?;
+        let Some(object_name) = objects.into_iter().next().and_then(|f| f.key) else {
+            eprintln!("No object found, skipping test");
+            return Ok(());
+        };
+
+        // Get the range
+        let data = client.get_range(&bucket_name, &object_name, 0, 1337).await;
+        assert!(data.is_ok());
+        assert_eq!(data.unwrap().into_bytes().len(), 1337);
         Ok(())
     }
 }
