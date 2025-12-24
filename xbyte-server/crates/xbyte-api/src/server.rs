@@ -1,6 +1,4 @@
-use crate::{
-    ClientRoute, ConfigX402, HealthRoute, MemoryDB, PlayerRoute, PricingRoute, S3Route, XByteS3,
-};
+use crate::{ClientRoute, ConfigX402, HealthRoute, MemoryDB, PricingRoute, S3Route, XByteS3};
 use actix_web::web::{Data, ThinData};
 use actix_web::{App, HttpServer};
 use std::net;
@@ -33,8 +31,6 @@ impl<A: net::ToSocketAddrs> Server<A> {
                 .app_data(config.clone())
                 .app_data(ThinData(db.clone()))
                 .app_data(ThinData(s3.clone()))
-                // Player routes
-                .service(PlayerRoute::Play)
                 // Health routes
                 .service(HealthRoute::Status)
                 .service(HealthRoute::Index)

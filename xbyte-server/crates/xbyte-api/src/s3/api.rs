@@ -1,6 +1,6 @@
-use crate::{ResultAPI, XByteS3};
+use crate::{ConfigX402, Database, MemoryDB, ResultAPI, XByteS3, utils, x402};
 use actix_web::dev::HttpServiceFactory;
-use actix_web::{Responder, get, web};
+use actix_web::{HttpRequest, Responder, get, web};
 use serde::{Deserialize, Serialize};
 
 /// The S3 Routes
@@ -74,15 +74,49 @@ async fn get_object(
     s3: web::ThinData<XByteS3>,
     path: web::Path<(String, String)>,
     range: web::Query<RangeRequest>,
+    request: HttpRequest,
+    db: web::ThinData<MemoryDB>,
+    config: web::Data<ConfigX402<&'static str>>,
+    auth: Option<x402::PaymentExtractor>,
 ) -> impl Responder {
-    let (bucket, object) = path.into_inner();
+    let url = request.full_url();
     let RangeRequest { offset, length } = range.into_inner();
 
-    // Get the range of the object
-    let data = match s3.get_range(&bucket, &object, offset, length).await {
-        Ok(data) => data,
-        Err(error) => return ResultAPI::failure(error.to_string()),
+    // Get the price in USDC / 1MB
+    let price = db.get_price(&path).unwrap_or(1000);
+    let total_price = utils::calculate_price(price as f32, length as f32).to_string();
+    let req = x402::PaymentRequest::new(&config, total_price, "Access the object", url);
+
+    // Check received payment
+    let request = x402::X402Response::new(&[req]);
+    let Some(payment) = auth else {
+        return ResultAPI::payment_required(request);
     };
 
-    ResultAPI::okay(data.into_bytes())
+    // Verify and settle the payment
+    let facilitator = x402::FacilitatorRequest::new(payment, request.accepts[0].clone());
+    match facilitator.verify() {
+        Ok(response) if response.is_valid() => {
+            tracing::info!(?response, "x402 Settlement started");
+            actix_web::rt::spawn(async move { facilitator.settle() });
+        }
+        Ok(response) => {
+            tracing::warn!(?response, "x402 Payment verification failed");
+            return ResultAPI::payment_required(request);
+        }
+        Err(error) => {
+            tracing::error!(?error, "Failed to verify x402 payment");
+            return ResultAPI::payment_required(request);
+        }
+    }
+
+    // Get the range of the object
+    let (bucket, object) = path.into_inner();
+    match s3.get_range(&bucket, &object, offset, length).await {
+        Ok(data) => ResultAPI::okay(data.into_bytes()),
+        Err(error) => {
+            tracing::error!(?error, "Failed to get object range");
+            ResultAPI::payment_required(request)
+        }
+    }
 }
