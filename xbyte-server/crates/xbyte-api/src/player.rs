@@ -1,13 +1,10 @@
 use crate::x402::{ConfigX402, FacilitatorRequest, PaymentExtractor, PaymentRequest, X402Response};
 use crate::{Database, MemoryDB, ResultAPI};
 use crate::{s3, utils};
-use actix_multipart::form::MultipartForm;
-use actix_multipart::form::tempfile::TempFile;
 use actix_web::Responder;
 use actix_web::dev::HttpServiceFactory;
 use actix_web::{HttpRequest, post, web};
 use serde::Deserialize;
-use std::io::Read;
 use uuid::Uuid;
 
 /// The Player Routes
@@ -15,15 +12,12 @@ use uuid::Uuid;
 pub enum PlayerRoute {
     /// The play endpoint
     Play,
-    /// The set content endpoint
-    SetContent,
 }
 
 impl HttpServiceFactory for PlayerRoute {
     fn register(self, config: &mut actix_web::dev::AppService) {
         match self {
             Self::Play => play.register(config),
-            Self::SetContent => set_content.register(config),
         }
     }
 }
@@ -85,33 +79,4 @@ async fn play(
     };
 
     ResultAPI::payment_required(request)
-}
-
-/// The request to set a content
-#[derive(Debug, MultipartForm)]
-pub struct SetContentRequest {
-    /// The content to set
-    pub content: TempFile,
-}
-
-/// The set content endpoint
-#[post("/content")]
-async fn set_content(
-    form: MultipartForm<SetContentRequest>,
-    db: web::ThinData<MemoryDB>,
-) -> impl Responder {
-    let mut content = form.content.file.as_file();
-    let mut buffer = vec![0u8; form.content.size];
-
-    if let Err(error) = content.read_exact(&mut buffer) {
-        tracing::error!(?error, "Failed to read content");
-        return ResultAPI::failure("Failed to read content");
-    };
-
-    let Ok(key) = db.set_content(buffer) else {
-        tracing::error!(?form.content, "Failed to set content");
-        return ResultAPI::failure("Content not set");
-    };
-
-    ResultAPI::okay(key)
 }

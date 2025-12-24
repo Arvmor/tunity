@@ -35,7 +35,6 @@ impl<A: net::ToSocketAddrs> Server<A> {
                 .app_data(ThinData(s3.clone()))
                 // Player routes
                 .service(PlayerRoute::Play)
-                .service(PlayerRoute::SetContent)
                 // Health routes
                 .service(HealthRoute::Status)
                 .service(HealthRoute::Index)
