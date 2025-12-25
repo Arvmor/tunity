@@ -72,31 +72,31 @@ const footerLinks: FooterLinkProps[][] = [
 ];
 
 export default function AppFooter() {
+    const links = footerLinks.map((links, index) => (
+        <div key={index} className="flex flex-col gap-2">
+            {links.map(({ isTitle, label, href }, index) => (
+                <Link
+                    key={index}
+                    href={href ?? "#"}
+                    className={cn(
+                        isTitle && "font-semibold text-primary!",
+                        "text-sm text-muted-foreground",
+                    )}
+                >
+                    {label}
+                </Link>
+            ))}
+        </div>
+    ));
+
     return (
         <div className="py-16">
             <Separator className="mb-16" />
 
-            <div className="flex justify-between">
+            <div className="flex flex-col md:flex-row justify-between">
                 <h1>App Footer</h1>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {footerLinks.map((links, index) => (
-                        <div key={index} className="flex flex-col gap-2">
-                            {links.map(({ isTitle, label, href }) => (
-                                <Link
-                                    key={label}
-                                    href={href ?? "#"}
-                                    className={cn(
-                                        isTitle && "font-semibold text-primary!",
-                                        "text-sm text-muted-foreground",
-                                    )}
-                                >
-                                    {label}
-                                </Link>
-                            ))}
-                        </div>
-                    ))}
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">{links}</div>
             </div>
         </div>
     );

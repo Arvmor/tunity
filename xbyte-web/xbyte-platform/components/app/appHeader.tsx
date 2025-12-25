@@ -18,17 +18,17 @@ const headerLinks: HeaderLinkProps[] = [
 ];
 
 export default function AppHeader() {
+    const links = headerLinks.map(({ label, href }, index) => (
+        <Link key={index} href={href ?? "#"} className="text-sm text-muted-foreground">
+            {label}
+        </Link>
+    ));
+
     return (
         <div className="flex justify-between items-center">
             <h1>App Header</h1>
 
-            <div className="flex items-center gap-4">
-                {headerLinks.map(({ label, href }) => (
-                    <Link key={label} href={href ?? "#"} className="text-sm text-muted-foreground">
-                        {label}
-                    </Link>
-                ))}
-            </div>
+            <div className="flex items-center gap-4">{links}</div>
         </div>
     );
 }
