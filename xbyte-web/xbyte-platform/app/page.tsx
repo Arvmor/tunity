@@ -1,7 +1,71 @@
+import CallToAction, { CallToActionProps } from "@/components/platform/callToAction";
+import Optionable, { OptionableProps } from "@/components/platform/optionable";
+import Paragraph, { ParagraphProps } from "@/components/platform/paragraph";
+import { Separator } from "@/components/ui/separator";
+import { Building2 } from "lucide-react";
+
+const startIntegration: CallToActionProps = {
+    titleText: "Integrate Your Data.",
+    descriptionText: "Connect AWS, GCP, Azure, or your storage. Secure integration in minutes.",
+    buttonText: "Start Integration",
+};
+
+const paragraph: ParagraphProps = {
+    title: "Integration Instructions",
+    text: "Select your preferred data storage provider above.Follow the step-by-step xByte instructions to configure access policies and permissions on AWS, GCP, Azure, or xByte Hosting.Ensure credentials are entered securely. After setup, click the Verify button below to confirm xByte's access.If verification succeeds, you will progress to wallet setup.",
+};
+
+const integrationOptions: OptionableProps[] = [
+    {
+        titleText: "AWS",
+        descriptionText: "Connect Amazon",
+        Icon: Building2,
+    },
+    {
+        titleText: "GCP",
+        descriptionText: "Connect Google Cloud",
+        Icon: Building2,
+    },
+    {
+        titleText: "Azure",
+        descriptionText: "Connect Azure",
+        Icon: Building2,
+    },
+];
+
+const setContentPricing: CallToActionProps = {
+    titleText: "Set Content Pricing.",
+    descriptionText: "Choose API or set manually. Flexible tiers for all.",
+    buttonText: "Get Started",
+};
+
+const verifySection: CallToActionProps = {
+    titleText: "Ready to verify?",
+    buttonText: "Verify",
+};
+
 export default function Home() {
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start"></main>
+        <div className="max-w-4xl mx-auto">
+            {/* Start Integrating */}
+            <CallToAction {...startIntegration} />
+
+            {/* Integration Options */}
+            <div className="flex flex-col md:flex-row gap-4 py-18">
+                {integrationOptions.map((option) => (
+                    <Optionable key={option.titleText} {...option} />
+                ))}
+            </div>
+
+            <Paragraph {...paragraph} />
+
+            <Separator className="my-16" />
+
+            {/* Verify Integration */}
+            <CallToAction {...verifySection} />
+
+            {/* Get Started */}
+            <CallToAction {...setContentPricing} />
         </div>
     );
 }
