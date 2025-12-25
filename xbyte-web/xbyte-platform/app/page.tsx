@@ -44,11 +44,18 @@ const verifySection: CallToActionProps = {
     buttonText: "Verify",
 };
 
+const heroSection: CallToActionProps = {
+    titleText: "Integrate xByte-SDK.",
+    descriptionText: "Get your API key and add xByte to your platform.",
+    buttonText: "Get API Key",
+    secondaryButtonText: "Documentation",
+};
+
 export default function Home() {
     return (
-        <div className="max-w-4xl mx-auto">
+        <div>
             {/* Start Integrating */}
-            <CallToAction {...startIntegration} />
+            <CallToAction {...heroSection} />
 
             {/* Integration Options */}
             <div className="flex flex-col md:flex-row gap-4 py-18">
