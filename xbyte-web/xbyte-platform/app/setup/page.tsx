@@ -54,10 +54,10 @@ export default function SetupPage() {
     };
 
     return (
-        <div>
+        <>
             {StepSection}
             <Button onClick={handleNextStep}>Next</Button>
-        </div>
+        </>
     );
 }
 

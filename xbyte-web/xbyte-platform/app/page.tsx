@@ -1,9 +1,12 @@
+"use client";
+
 import CallToAction, { CallToActionProps } from "@/components/platform/callToAction";
 import Feature, { FeatureProps } from "@/components/platform/feature";
 import Optionable, { OptionableProps } from "@/components/platform/optionable";
 import Paragraph, { ParagraphProps } from "@/components/platform/paragraph";
 import { Separator } from "@/components/ui/separator";
 import { Building2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const paragraph: ParagraphProps = {
     title: "Integration Instructions",
@@ -60,10 +63,16 @@ const feature: FeatureProps[] = [
 ];
 
 export default function Home() {
+    const router = useRouter();
+
+    function goToSetupPage() {
+        router.push("/setup");
+    }
+
     return (
-        <div>
+        <>
             {/* Start Integrating */}
-            <CallToAction {...heroSection} />
+            <CallToAction {...heroSection} buttonAction={goToSetupPage} />
 
             {/* Integration Options */}
             <div className="flex flex-col md:flex-row gap-4 py-18">
@@ -87,6 +96,6 @@ export default function Home() {
 
             {/* Get Started */}
             <CallToAction {...setContentPricing} />
-        </div>
+        </>
     );
 }
