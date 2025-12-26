@@ -19,6 +19,10 @@ on:
 env:
   FOUNDRY_PROFILE: ci
 
+defaults:
+  run:
+    working-directory: xbyte-contracts
+
 jobs:
   fmt:
     name: Foundry Format
