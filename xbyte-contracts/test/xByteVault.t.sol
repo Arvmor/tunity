@@ -25,6 +25,23 @@ contract xByteVaultTest is Test {
         assertEq(fee, 1);
     }
 
+    function test_withdrawNative() public {
+        // Before Withdraw
+        uint256 vaultBefore = vault.owner().balance;
+        uint256 factoryBefore = vault.factory().balance;
+
+        // Check the received amount
+        vm.deal(address(vault), 100);
+        vault.withdraw();
+
+        // After Withdraw
+        uint256 vaultAfter = vault.owner().balance;
+        uint256 factoryAfter = vault.factory().balance;
+
+        assertEq(vaultAfter - vaultBefore, 99);
+        assertEq(factoryAfter - factoryBefore, 1);
+    }
+
     function test_withdrawERC20() public {
         ERC20Mock token = new ERC20Mock();
         token.mint(address(vault), 100);

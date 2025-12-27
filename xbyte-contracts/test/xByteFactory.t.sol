@@ -17,4 +17,23 @@ contract xByteFactoryTest is Test {
     function test_deploy_address() public {
         factory.createVault();
     }
+
+    function test_withdrawNative() public {
+        // Before Withdraw
+        uint256 beforeFactory = address(factory).balance;
+        uint256 beforeOwner = factory.owner().balance;
+
+        // After Withdraw
+        vm.deal(address(factory), 100);
+        factory.withdraw();
+
+        // After Withdraw
+        uint256 afterFactory = address(factory).balance;
+        uint256 afterOwner = factory.owner().balance;
+
+        assertEq(afterFactory - beforeFactory, 0);
+        assertEq(afterOwner - beforeOwner, 100);
+    }
+
+    receive() external payable {}
 }

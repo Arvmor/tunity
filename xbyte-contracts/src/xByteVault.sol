@@ -11,7 +11,6 @@ contract xByteVault is Ownable {
     Vault public vault;
 
     event WithdrawNative(uint256 amount, uint256 fee, address indexed owner, address indexed factory);
-
     event Withdraw(uint256 amount, uint256 fee, address indexed owner, address indexed factory, address indexed token);
 
     constructor() Ownable(tx.origin) {

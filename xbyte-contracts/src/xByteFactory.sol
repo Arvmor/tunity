@@ -3,6 +3,8 @@ pragma solidity ^0.8.31;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 struct Vault {
     address vaultAddress;
@@ -17,6 +19,8 @@ contract xByteFactory is Ownable {
     mapping(address => Vault) public vaults;
 
     event VaultCreated(address indexed owner, address indexed vaultAddress);
+    event WithdrawNative(uint256 amount, address indexed owner);
+    event Withdraw(uint256 amount, address indexed owner, address indexed token);
 
     constructor(bytes memory _vaultImplementation) Ownable(msg.sender) {
         vaultImplementation = _vaultImplementation;
@@ -48,4 +52,21 @@ contract xByteFactory is Ownable {
         bytes32 salt = bytes32(bytes20(owner));
         return Create2.deploy(0, salt, vaultImplementation);
     }
+
+    function withdraw() public {
+        uint256 balance = address(this).balance;
+
+        Address.sendValue(payable(owner()), balance);
+        emit WithdrawNative(balance, owner());
+    }
+
+    function withdrawERC20(address _token) public {
+        IERC20 token = IERC20(_token);
+        uint256 balance = token.balanceOf(address(this));
+
+        require(token.transfer(owner(), balance));
+        emit Withdraw(balance, owner(), _token);
+    }
+
+    receive() external payable {}
 }
