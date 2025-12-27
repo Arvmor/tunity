@@ -7,3 +7,5 @@ edition = "2024"
 alloy-sol-types.workspace = true
 alloy-contract.workspace = true
 alloy-provider.workspace = true
+alloy-primitives.workspace = true
+anyhow.workspace = true

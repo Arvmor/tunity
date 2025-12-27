@@ -5510,8 +5510,10 @@ name = "xbyte-evm"
 version = "0.1.0"
 dependencies = [
  "alloy-contract",
+ "alloy-primitives",
  "alloy-provider",
  "alloy-sol-types",
+ "anyhow",
 ]
 
 [[package]]
@@ -5532,6 +5534,7 @@ dependencies = [
  "ureq",
  "url",
  "uuid",
+ "xbyte-evm",
 ]
 
 [[package]]
