@@ -20,14 +20,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    working-directory: xbyte-web
+
 jobs:
   fromat:
     name: Format
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: xbyte-web
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
@@ -41,9 +42,6 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: xbyte-web
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
@@ -57,9 +55,6 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: xbyte-web
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
