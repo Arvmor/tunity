@@ -11,14 +11,14 @@ struct Vault {
 }
 
 contract xByteFactory is Ownable {
-    address public vaultImplementation;
+    bytes public vaultImplementation;
     uint8 public constant COMMISSION_FEE = 1;
 
     mapping(address => Vault) public vaults;
 
     event VaultCreated(address indexed owner, address indexed vaultAddress);
 
-    constructor(address _vaultImplementation) Ownable(msg.sender) {
+    constructor(bytes memory _vaultImplementation) Ownable(msg.sender) {
         vaultImplementation = _vaultImplementation;
     }
 
@@ -38,11 +38,12 @@ contract xByteFactory is Ownable {
 
     function computeVaultAddress(address owner) public view returns (address) {
         bytes32 salt = bytes32(bytes20(owner));
-        return Create2.computeAddress(salt, vaultImplementation.codehash);
+        bytes32 codehash = keccak256(vaultImplementation);
+        return Create2.computeAddress(salt, codehash);
     }
 
     function _deployVault(address owner) internal returns (address addr) {
         bytes32 salt = bytes32(bytes20(owner));
-        return Create2.deploy(0, salt, vaultImplementation.code);
+        return Create2.deploy(0, salt, vaultImplementation);
     }
 }

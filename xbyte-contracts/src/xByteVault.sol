@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.33;
+pragma solidity ^0.8.31;
 
 import {Vault} from "./xByteFactory.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -25,13 +25,9 @@ contract xByteVault is Ownable {
         address indexed token
     );
 
-    constructor(
-        Vault memory _vault,
-        address _factory,
-        address _owner
-    ) Ownable(_owner) {
-        vault = _vault;
-        factory = _factory;
+    constructor() Ownable(tx.origin) {
+        vault = Vault({vaultAddress: address(this), owner: owner(), fee: 1});
+        factory = msg.sender;
     }
 
     function withdraw() public {
