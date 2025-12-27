@@ -16,6 +16,8 @@ contract xByteFactory is Ownable {
 
     mapping(address => Vault) public vaults;
 
+    event VaultCreated(address indexed owner, address indexed vaultAddress);
+
     constructor(address _vaultImplementation) Ownable(msg.sender) {
         vaultImplementation = _vaultImplementation;
     }
@@ -30,6 +32,7 @@ contract xByteFactory is Ownable {
             fee: COMMISSION_FEE
         });
 
+        emit VaultCreated(owner, vaultAddress);
         return vaultAddress;
     }
 

@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.33;
+
+import {Vault} from "./xByteFactory.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract xByteVault is Ownable {
+    address public factory;
+    Vault public vault;
+
+    event WithdrawNative(
+        uint256 amount,
+        uint256 fee,
+        address indexed owner,
+        address indexed factory
+    );
+
+    event Withdraw(
+        uint256 amount,
+        uint256 fee,
+        address indexed owner,
+        address indexed factory,
+        address indexed token
+    );
+
+    constructor(
+        Vault memory _vault,
+        address _factory,
+        address _owner
+    ) Ownable(_owner) {
+        vault = _vault;
+        factory = _factory;
+    }
+
+    function withdraw() public {
+        uint256 balance = address(this).balance;
+        uint256 fee = (balance * vault.fee) / 100;
+        uint256 amount = balance - fee;
+
+        Address.sendValue(payable(factory), fee);
+        Address.sendValue(payable(owner()), amount);
+
+        emit WithdrawNative(amount, fee, owner(), factory);
+    }
+
+    function withdrawERC20(address _token) public {
+        IERC20 token = IERC20(_token);
+
+        uint256 balance = token.balanceOf(address(this));
+        uint256 fee = (balance * vault.fee) / 100;
+        uint256 amount = balance - fee;
+
+        require(token.transfer(factory, fee));
+        require(token.transfer(owner(), amount));
+
+        emit Withdraw(amount, fee, owner(), factory, _token);
+    }
+}
