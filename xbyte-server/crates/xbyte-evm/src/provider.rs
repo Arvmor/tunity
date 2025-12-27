@@ -1,6 +1,8 @@
 use alloy_provider::{DynProvider, Provider, network::Ethereum};
 use std::ops::Deref;
 
+/// xByte EVM Client
+#[derive(Debug, Clone)]
 pub struct Client(DynProvider<Ethereum>);
 
 impl Client {
