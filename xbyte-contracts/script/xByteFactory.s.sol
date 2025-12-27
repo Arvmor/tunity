@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.33;
+pragma solidity ^0.8.31;
 
 import {Script} from "forge-std/Script.sol";
+import {xByteVault} from "../src/xByteVault.sol";
 import {xByteFactory} from "../src/xByteFactory.sol";
 
 contract xByteFactoryScript is Script {
@@ -12,7 +13,8 @@ contract xByteFactoryScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        factory = new xByteFactory(address(1337));
+        bytes memory initCode = type(xByteVault).creationCode;
+        factory = new xByteFactory(initCode);
 
         vm.stopBroadcast();
     }

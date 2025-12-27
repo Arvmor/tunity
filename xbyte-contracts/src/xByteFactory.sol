@@ -26,11 +26,7 @@ contract xByteFactory is Ownable {
         address owner = msg.sender;
         address vaultAddress = _deployVault(owner);
 
-        vaults[owner] = Vault({
-            vaultAddress: vaultAddress,
-            owner: owner,
-            fee: COMMISSION_FEE
-        });
+        vaults[owner] = Vault({vaultAddress: vaultAddress, owner: owner, fee: COMMISSION_FEE});
 
         emit VaultCreated(owner, vaultAddress);
         return vaultAddress;
@@ -38,7 +34,13 @@ contract xByteFactory is Ownable {
 
     function computeVaultAddress(address owner) public view returns (address) {
         bytes32 salt = bytes32(bytes20(owner));
-        bytes32 codehash = keccak256(vaultImplementation);
+        bytes memory implementation = vaultImplementation;
+
+        bytes32 codehash;
+        assembly {
+            codehash := keccak256(add(implementation, 0x20), mload(implementation))
+        }
+
         return Create2.computeAddress(salt, codehash);
     }
 

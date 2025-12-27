@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.33;
+pragma solidity ^0.8.31;
 
 import {Test} from "forge-std/Test.sol";
-import {console} from "forge-std/console.sol";
 import {xByteFactory} from "../src/xByteFactory.sol";
 import {xByteVault} from "../src/xByteVault.sol";
 
@@ -11,13 +10,16 @@ contract xByteVaultTest is Test {
     xByteVault public vault;
 
     function setUp() public {
-        vm.etch(address(1337), bytes("test"));
-        factory = new xByteFactory(address(1337));
+        // Deploy time bytecode of xByteVault
+        bytes memory initCode = type(xByteVault).creationCode;
+        factory = new xByteFactory(initCode);
+        address vaultAddress = factory.createVault();
+        vault = xByteVault(vaultAddress);
     }
 
     function test_createVault() public {
-        factory.createVault();
-        (, address owner, uint8 fee) = factory.vaults(msg.sender);
+        (address vaultAddress, address owner, uint8 fee) = vault.vault();
+        assertEq(vaultAddress, address(vault));
         assertEq(owner, msg.sender);
         assertEq(fee, 1);
     }
